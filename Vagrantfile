@@ -27,6 +27,9 @@ Vagrant.configure("2") do |config|
     vb.memory = MEMORY
     vb.customize ["modifyvm", :id, "--cpus", NB_CPUS]
 
+    # drives
+    vb.customize ['storageattach', :id, '--storagectl', 'IDE Controller', '--device', 1, '--port', 1, '--type', 'dvddrive', '--medium', 'emptydrive']
+
     # graphics
     vb.customize ["modifyvm", :id, "--monitorcount", NB_MONITORS]
     vb.customize ["modifyvm", :id, "--vram", VRAM]
@@ -45,4 +48,10 @@ Vagrant.configure("2") do |config|
 
   # mount my Users\<>\src folder on host to /home/vagrant/src
   config.vm.synced_folder ENV['USERPROFILE'] + "/src", "/home/vagrant/src"
+  
+  # Provision code arch setup
+  config.vm.provision "shell", path: "1-setup-arch.sh"
+  
+  # install core components
+  config.vm.provision "shell", path: "2-core.sh"
 end
