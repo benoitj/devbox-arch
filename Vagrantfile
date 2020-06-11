@@ -13,6 +13,9 @@ Vagrant.configure("2") do |config|
   unless Vagrant.has_plugin?("vagrant-disksize")
     raise 'You must install the vagrant-disksize plugin. install using: vagrant plugin install vagrant-disksize'
   end
+  unless Vagrant.has_plugin?("vagrant-reload")
+    raise 'You must install the vagrant-reload plugin. install using: vagrant plugin install vagrant-reload'
+  end
 
   # TODO: create a new /home directory with the ~40G extra
   #config.disksize.size = SYSTEM_DISK_SIZE
@@ -28,7 +31,7 @@ Vagrant.configure("2") do |config|
     vb.customize ["modifyvm", :id, "--cpus", NB_CPUS]
 
     # drives
-    vb.customize ['storageattach', :id, '--storagectl', 'IDE Controller', '--device', 1, '--port', 1, '--type', 'dvddrive', '--medium', 'emptydrive']
+    vb.customize ['storageattach', :id, '--storagectl', 'IDE Controller', '--device', 1, '--port', 1, '--type', 'dvddrive', '--medium', 'C:\Program Files\Oracle\Virtualbox\VBoxGuestAdditions.iso']
 
     # graphics
     vb.customize ["modifyvm", :id, "--monitorcount", NB_MONITORS]
@@ -51,7 +54,11 @@ Vagrant.configure("2") do |config|
   
   # Provision code arch setup
   config.vm.provision "shell", path: "1-setup-arch.sh"
+
+  config.vm.provision :reload
   
   # install core components
   config.vm.provision "shell", path: "2-core.sh"
+
+  config.vm.provision :reload
 end

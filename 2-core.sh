@@ -15,6 +15,10 @@ systemctl start vboxservice
 # packages needed if you want to compile guest additions from iso:
 pacman -S --noconfirm which gcc make perl linux-headers vim
 
+# install guest additions
+mount /dev/sr0 /mnt && cd /mnt && ./VBoxLinuxAdditions.run -- --force
+umount -f /mnt
+
 # start lxdm at boot
 systemctl enable lxdm
 systemctl start lxdm
