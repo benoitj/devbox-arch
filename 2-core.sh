@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # install X LXDE and alsa utils
-pacman -S --noconfirm xorg-server lxde xf86-video-vmware
+pacman -S --noconfirm xorg-server openbox xf86-video-vmware lightdm lightdm-gtk-greeter rxvt-unicode
 
 # PulseAudio seems to remove crackling sound, YMMV
 pacman -S --noconfirm alsa-utils pulseaudio pulseaudio-alsa
@@ -19,7 +19,13 @@ pacman -S --noconfirm which gcc make perl linux-headers vim
 mount /dev/sr0 /mnt && cd /mnt && ./VBoxLinuxAdditions.run -- --force
 umount -f /mnt
 
+# setup autologin
+groupadd -r autologin
+usermod -a -G autologin vagrant
+sed -i -e 's/# *autologin-user=.*/autologin-user=vagrant/' /etc/lightdm/lightdm.conf
+sed -i -e 's/# *autologin-session=.*/autologin-session=openbox/' /etc/lightdm/lightdm.conf
+
 # start lxdm at boot
-systemctl enable lxdm
-systemctl start lxdm
+systemctl enable lightdm
+systemctl start lightdm
 
