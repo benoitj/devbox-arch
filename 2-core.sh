@@ -19,11 +19,36 @@ pacman -S --noconfirm which gcc make perl linux-headers vim
 mount /dev/sr0 /mnt && cd /mnt && ./VBoxLinuxAdditions.run -- --force
 umount -f /mnt
 
+cat <<EOT >/usr/local/bin/xinitrcsession-helper
+#!/bin/bash
+exec \$HOME/.xinitrc
+EOT
+
+chmod 755 /usr/local/bin/xinitrcsession-helper
+
+cat <<EOT >/usr/share/xsessions/xinitrc.desktop
+[Desktop Entry]
+Name=xinitrc
+Comment=Executes the .xinitrc script in your home directory
+Exec=/usr/local/bin/xinitrcsession-helper
+TryExec=/usr/local/bin/xinitrcsession-helper
+Type=Application
+EOT
+
+cat <<EOT > ~vagrant/.xinitrc
+#!/bin/bash
+exec /usr/bin/openbox
+EOT
+
+chown vagrant:vagrant ~vagrant/.xinitrc
+chmod +x ~vagrant/.xinitrc
+
+
 # setup autologin
 groupadd -r autologin
 usermod -a -G autologin vagrant
 sed -i -e 's/# *autologin-user=.*/autologin-user=vagrant/' /etc/lightdm/lightdm.conf
-sed -i -e 's/# *autologin-session=.*/autologin-session=openbox/' /etc/lightdm/lightdm.conf
+sed -i -e 's/# *autologin-session=.*/autologin-session=xinitrc/' /etc/lightdm/lightdm.conf
 
 # start lxdm at boot
 systemctl enable lightdm
