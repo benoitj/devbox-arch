@@ -13,27 +13,14 @@ systemctl enable vboxservice
 systemctl start vboxservice
 
 # packages needed if you want to compile guest additions from iso:
-pacman -S --noconfirm which gcc make perl linux-headers vim
+pacman -S --noconfirm which gcc make perl linux-headers vim git fakeroot
 
 # install guest additions
 mount /dev/sr0 /mnt && cd /mnt && ./VBoxLinuxAdditions.run -- --force
 umount -f /mnt
 
-cat <<EOT >/usr/local/bin/xinitrcsession-helper
-#!/bin/bash
-exec \$HOME/.xinitrc
-EOT
+cd /tmp && sudo -u vagrant git clone https://aur.archlinux.org/xinit-xsession.git && cd xinit-xsession && sudo -u vagrant git checkout 7cae213844b && sudo -u vagrant makepkg -sic --noconfirm
 
-chmod 755 /usr/local/bin/xinitrcsession-helper
-
-cat <<EOT >/usr/share/xsessions/xinitrc.desktop
-[Desktop Entry]
-Name=xinitrc
-Comment=Executes the .xinitrc script in your home directory
-Exec=/usr/local/bin/xinitrcsession-helper
-TryExec=/usr/local/bin/xinitrcsession-helper
-Type=Application
-EOT
 
 cat <<EOT > ~vagrant/.xinitrc
 #!/bin/bash
